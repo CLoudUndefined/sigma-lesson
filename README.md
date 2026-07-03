@@ -1,2 +1,2 @@
 # sigma-lesson
-Nothing
+Nothing is nothing
