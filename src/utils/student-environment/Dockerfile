@@ -18,9 +18,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tree \
     e2fsprogs \
     nano \
+    cron \
+    supervisor \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /var/run/sshd
+RUN mkdir -p /var/run/sshd /var/log/supervisor
 
 ARG STUDENT_LOGIN=student
 ARG STUDENT_PASSWORD=changeme
@@ -43,6 +45,8 @@ COPY student-environment/templates/contract.txt /home/${STUDENT_LOGIN}/contract.
 
 RUN chown -R ${STUDENT_LOGIN}:${STUDENT_LOGIN} /home/${STUDENT_LOGIN}
 
+COPY student-environment/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
 EXPOSE 22 80
 
-CMD ["/usr/sbin/sshd", "-D"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
