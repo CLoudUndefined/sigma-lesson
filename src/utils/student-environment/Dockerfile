@@ -34,12 +34,12 @@ RUN useradd -m -s /bin/bash "${STUDENT_LOGIN}" \
 COPY --from=signed-builder /build/signed /usr/local/bin/signed
 RUN chmod 755 /usr/local/bin/signed
 
-COPY bashrc-snippet.sh /tmp/bashrc-snippet.sh
+COPY student-environment/bashrc-snippet.sh /tmp/bashrc-snippet.sh
 RUN cat /tmp/bashrc-snippet.sh >> /home/${STUDENT_LOGIN}/.bashrc \
     && rm /tmp/bashrc-snippet.sh
 
-COPY templates/README_FIRST.txt /home/${STUDENT_LOGIN}/README_FIRST.txt
-COPY templates/contract.txt /home/${STUDENT_LOGIN}/contract.txt
+COPY student-environment/templates/README-FIRST.txt /home/${STUDENT_LOGIN}/README-FIRST.txt
+COPY student-environment/templates/contract.txt /home/${STUDENT_LOGIN}/contract.txt
 
 RUN chown -R ${STUDENT_LOGIN}:${STUDENT_LOGIN} /home/${STUDENT_LOGIN}
 
