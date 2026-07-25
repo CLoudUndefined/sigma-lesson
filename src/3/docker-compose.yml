@@ -1,8 +1,0 @@
-services:
-  lesson:
-    build:
-      context: ./docker
-    ports:
-      - "2222:22"   # SSH - ssh student@localhost -p 2222
-      - "8080:80"   # HTTP - http://demo-lecture.local:8080
-    restart: unless-stopped
