@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nano \
     cron \
     supervisor \
+    ncurses-term \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /var/run/sshd /var/log/supervisor
