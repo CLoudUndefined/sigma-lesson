@@ -59,6 +59,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	if len(allWords) < passwordWordsMax {
+		fmt.Fprintf(os.Stderr, "Ошибка: общий словарь слишком мал для генерации пароля без повторов (нужно минимум %d слов, есть %d).\n", passwordWordsMax, len(allWords))
+		os.Exit(1)
+	}
+
 	usedLogins := make(map[string]bool)
 	usedPorts := make(map[int]bool)
 
@@ -160,9 +165,15 @@ func generateUniqueLogin(adjectives, nouns []string, usedLogins map[string]bool)
 func generatePassword(allWords []string) string {
 	wordCount := passwordWordsMin + rand.Intn(passwordWordsMax-passwordWordsMin+1)
 
-	parts := make([]string, wordCount)
-	for i := 0; i < wordCount; i++ {
-		parts[i] = allWords[rand.Intn(len(allWords))]
+	usedInThisPassword := make(map[string]bool)
+	parts := make([]string, 0, wordCount)
+	for len(parts) < wordCount {
+		word := allWords[rand.Intn(len(allWords))]
+		if usedInThisPassword[word] {
+			continue
+		}
+		usedInThisPassword[word] = true
+		parts = append(parts, word)
 	}
 
 	digitCount := 1 + rand.Intn(2)
