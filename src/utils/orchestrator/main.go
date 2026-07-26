@@ -155,57 +155,81 @@ func buildRealTree(outputDir string, manifest TreeManifest) error {
 		return err
 	}
 
+	usedPaths := make(map[string]bool)
+
 	for _, entry := range manifest.Files {
-		content, err := resolveContent(entry.ContentKey)
+		fullPath, err := resolveAndWriteEntry(outputDir, entry, usedPaths)
 		if err != nil {
 			return fmt.Errorf("путь %s (%s): %w", entry.Path, entry.ContentKey, err)
 		}
-
-		fullPath := filepath.Join(outputDir, entry.Path)
-		if err := os.MkdirAll(filepath.Dir(fullPath), 0755); err != nil {
-			return err
-		}
-		if err := os.WriteFile(fullPath, []byte(content), 0644); err != nil {
-			return err
-		}
+		usedPaths[fullPath] = true
 	}
 
 	return nil
 }
 
-func resolveContent(key string) (string, error) {
+func resolveAndWriteEntry(outputDir string, entry FileEntry, usedPaths map[string]bool) (string, error) {
+	const maxAttempts = 20
+
+	for range maxAttempts {
+		content, extraName, err := resolveContent(entry.ContentKey)
+		if err != nil {
+			return "", err
+		}
+
+		targetPath := entry.Path
+		if extraName != "" {
+			targetPath = filepath.Join(entry.Path, extraName)
+		}
+
+		fullPath := filepath.Join(outputDir, targetPath)
+
+		if usedPaths[fullPath] {
+			if extraName == "" {
+				return "", fmt.Errorf("неожиданная коллизия пути для не-мусорной записи: %s", fullPath)
+			}
+			continue
+		}
+
+		if err := os.MkdirAll(filepath.Dir(fullPath), 0755); err != nil {
+			return "", err
+		}
+		if err := os.WriteFile(fullPath, content, 0644); err != nil {
+			return "", err
+		}
+
+		return fullPath, nil
+	}
+
+	return "", fmt.Errorf("не удалось найти свободный путь за %d попыток (возможно, в trash_pool слишком мало файлов для данной глубины дерева)", maxAttempts)
+}
+
+func resolveContent(key string) (content []byte, extraName string, err error) {
 	switch {
 	case key == "correct_code":
-		return generateValidCode() + "\n", nil
+		return []byte(generateValidCode() + "\n"), "", nil
 	case key == "beagle_code":
-		return beagleCode + "\n", nil
+		return []byte(beagleCode + "\n"), "", nil
 	case key == "trap_1" || key == "trap_2" || key == "trap_3":
-		return readFile(filepath.Join(trapsDir, key+".txt"))
+		data, err := os.ReadFile(filepath.Join(trapsDir, key+".txt"))
+		return data, "", err
 	case strings.HasPrefix(key, "trash:"):
 		parts := strings.Split(key, ":")
 		if len(parts) != 3 {
-			return "", fmt.Errorf("неверный формат content_key: %s", key)
+			return nil, "", fmt.Errorf("неверный формат content_key: %s", key)
 		}
 		category := parts[1]
 		return pickRandomTrashFile(category)
 	default:
-		return "", fmt.Errorf("неизвестный content_key: %s", key)
+		return nil, "", fmt.Errorf("неизвестный content_key: %s", key)
 	}
 }
 
-func readFile(path string) (string, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return "", err
-	}
-	return string(data), nil
-}
-
-func pickRandomTrashFile(category string) (string, error) {
+func pickRandomTrashFile(category string) (content []byte, filename string, err error) {
 	dir := filepath.Join(trashPoolDir, category)
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
 	var files []string
 	for _, e := range entries {
@@ -214,10 +238,11 @@ func pickRandomTrashFile(category string) (string, error) {
 		}
 	}
 	if len(files) == 0 {
-		return "", fmt.Errorf("папка %s пуста", dir)
+		return nil, "", fmt.Errorf("папка %s пуста", dir)
 	}
 	chosen := files[rand.Intn(len(files))]
-	return readFile(filepath.Join(dir, chosen))
+	data, err := os.ReadFile(filepath.Join(dir, chosen))
+	return data, chosen, err
 }
 
 func generateValidCode() string {
