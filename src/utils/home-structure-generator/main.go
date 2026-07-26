@@ -123,12 +123,24 @@ func buildRandomPath(branch, filename string) string {
 	parts := []string{branch}
 
 	extraFolders := depth - 1
+	lastFolder := ""
 	for i := 0; i < extraFolders; i++ {
-		parts = append(parts, subfolderPool[rand.Intn(len(subfolderPool))])
+		next := pickDifferentFolder(lastFolder)
+		parts = append(parts, next)
+		lastFolder = next
 	}
 	parts = append(parts, filename)
 
 	return filepath.Join(parts...)
+}
+
+func pickDifferentFolder(exclude string) string {
+	for {
+		candidate := subfolderPool[rand.Intn(len(subfolderPool))]
+		if candidate != exclude {
+			return candidate
+		}
+	}
 }
 
 func itemFileName(role string) string {
