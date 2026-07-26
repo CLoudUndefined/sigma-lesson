@@ -1,0 +1,8 @@
+# старый конфиг, до миграции на traefik
+# не удалять, вдруг понадобится откатиться
+
+server {
+    listen 80;
+    server_name old.example.local;
+    root /var/www/old_site;
+}
