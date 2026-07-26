@@ -100,15 +100,15 @@ func generateTree(treeID string) TreeManifest {
 
 	for idx, branch := range themedBranches {
 		role := shuffledRoles[idx]
-		itemPath := buildRandomPath(branch, itemFileName(role))
+		itemPath := buildRandomFilePath(branch, itemFileName(role))
 		files = append(files, FileEntry{Path: itemPath, ContentKey: role})
 
 		trashCount := minTrashPerBranch + rand.Intn(maxTrashPerBranch-minTrashPerBranch+1)
 		category := branchTrashCategory[branch]
 		for t := 0; t < trashCount; t++ {
 			trashKey := fmt.Sprintf("trash:%s:%d", category, t+1)
-			trashPath := buildRandomPath(branch, trashFileName(category, t+1))
-			files = append(files, FileEntry{Path: trashPath, ContentKey: trashKey})
+			trashDir := buildRandomDirPath(branch)
+			files = append(files, FileEntry{Path: trashDir, ContentKey: trashKey})
 		}
 	}
 
@@ -118,18 +118,21 @@ func generateTree(treeID string) TreeManifest {
 	return TreeManifest{TreeID: treeID, Files: files}
 }
 
-func buildRandomPath(branch, filename string) string {
+func buildRandomFilePath(branch, filename string) string {
+	return filepath.Join(buildRandomDirPath(branch), filename)
+}
+
+func buildRandomDirPath(branch string) string {
 	depth := minDepth + rand.Intn(maxDepth-minDepth+1)
 	parts := []string{branch}
 
 	extraFolders := depth - 1
 	lastFolder := ""
-	for i := 0; i < extraFolders; i++ {
+	for range extraFolders {
 		next := pickDifferentFolder(lastFolder)
 		parts = append(parts, next)
 		lastFolder = next
 	}
-	parts = append(parts, filename)
 
 	return filepath.Join(parts...)
 }
@@ -156,10 +159,6 @@ func itemFileName(role string) string {
 	default:
 		return "note.txt"
 	}
-}
-
-func trashFileName(category string, n int) string {
-	return fmt.Sprintf("%s_note_%d.txt", category, n)
 }
 
 func shuffleStrings(in []string) []string {
