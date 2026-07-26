@@ -25,6 +25,11 @@ const (
 	attackRepeats  = 30
 
 	tmpLogDir = "tmp_logs"
+
+	backdoorHideoutDir  = "/opt/.sys-cache"
+	backdoorPyFilename  = "updater.py"
+	backdoorLinkName    = ".cache-sync"
+	backdoorTemplateRel = "templates/backdoor.py"
 )
 
 var normalIPs = []string{
@@ -138,7 +143,73 @@ func processStudent(containerName, login string) {
 		fmt.Printf("[%s] ПРЕДУПРЕЖДЕНИЕ: не удалось поправить права на %s: %v\n", login, hiddenSecretDir, err)
 	}
 
+	if err := plantBackdoor(containerName, login); err != nil {
+		fmt.Printf("[%s] ПРЕДУПРЕЖДЕНИЕ: не удалось разместить гроб-задание (симлинк на .py): %v\n", login, err)
+	}
+
 	fmt.Printf("[%s] готово: конфиг украден, access.log/note.txt/scammer.txt на месте\n", login)
+}
+
+func plantBackdoor(containerName, login string) error {
+	if err := runDockerExec(containerName, "mkdir", "-p", backdoorHideoutDir); err != nil {
+		return fmt.Errorf("создание %s: %w", backdoorHideoutDir, err)
+	}
+	if err := runDockerExec(containerName, "chown", "root:root", backdoorHideoutDir); err != nil {
+		return fmt.Errorf("chown %s: %w", backdoorHideoutDir, err)
+	}
+	if err := runDockerExec(containerName, "chmod", "0711", backdoorHideoutDir); err != nil {
+		return fmt.Errorf("chmod %s: %w", backdoorHideoutDir, err)
+	}
+
+	realPath := backdoorHideoutDir + "/" + backdoorPyFilename
+	templatePath := filepath.Join(templatesDir, "backdoor.py")
+	if err := dockerCp(templatePath, containerName, realPath); err != nil {
+		return fmt.Errorf("копирование %s: %w", backdoorTemplateRel, err)
+	}
+	if err := runDockerExec(containerName, "chown", login+":"+login, realPath); err != nil {
+		return fmt.Errorf("chown %s: %w", realPath, err)
+	}
+	if err := runDockerExec(containerName, "chmod", "0400", realPath); err != nil {
+		return fmt.Errorf("chmod %s: %w", realPath, err)
+	}
+
+	targetDir, err := pickRandomHomeDir(containerName, login)
+	if err != nil {
+		return fmt.Errorf("выбор случайной директории в домашней папке: %w", err)
+	}
+
+	linkPath := targetDir + "/" + backdoorLinkName
+	if err := runDockerExec(containerName, "ln", "-s", realPath, linkPath); err != nil {
+		return fmt.Errorf("создание симлинка %s -> %s: %w", linkPath, realPath, err)
+	}
+	if err := runDockerExec(containerName, "chown", "-h", login+":"+login, linkPath); err != nil {
+		fmt.Printf("[%s] ПРЕДУПРЕЖДЕНИЕ: не удалось поправить владельца симлинка %s: %v\n", login, linkPath, err)
+	}
+
+	return nil
+}
+
+func pickRandomHomeDir(containerName, login string) (string, error) {
+	homeDir := "/home/" + login
+
+	cmd := exec.Command("docker", "exec", containerName, "find", homeDir, "-maxdepth", "4", "-type", "d")
+	out, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+
+	var dirs []string
+	for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
+		line = strings.TrimSpace(line)
+		if line != "" {
+			dirs = append(dirs, line)
+		}
+	}
+	if len(dirs) == 0 {
+		return homeDir, nil
+	}
+
+	return dirs[rand.Intn(len(dirs))], nil
 }
 
 func loadLogins(path string) ([]string, error) {
