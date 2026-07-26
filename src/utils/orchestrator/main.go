@@ -17,6 +17,7 @@ const (
 
 	trashPoolDir = "content/trash_pool"
 	trapsDir     = "content/traps"
+	lesson2Dir   = "content/lesson2"
 
 	beagleCode = "SHER-L0CK"
 
@@ -77,6 +78,11 @@ func main() {
 			os.Exit(1)
 		}
 
+		if err := addLesson2Content(preparedPath); err != nil {
+			fmt.Fprintf(os.Stderr, "Ошибка добавления контента занятия 2 для %s: %v\n", student.Login, err)
+			os.Exit(1)
+		}
+
 		containerName := "sigma-" + student.Login
 
 		startLines = append(startLines, generateStartBlock(student, containerName, preparedPath))
@@ -121,7 +127,7 @@ func loadStudents(path string) ([]Student, error) {
 	}
 
 	var students []Student
-	for _, rec := range records[1:] {
+	for _, rec := range records[1:] { // пропускаем заголовок
 		if len(rec) < 4 {
 			continue
 		}
@@ -300,6 +306,7 @@ func generateStartBlock(s Student, containerName, preparedPath string) string {
 	b.WriteString("else\n")
 	fmt.Fprintf(&b, "  docker cp %s/. %s:/home/%s/\n", preparedPath, containerName, s.Login)
 	fmt.Fprintf(&b, "  docker exec %s chown -R %s:%s /home/%s\n", containerName, s.Login, s.Login, s.Login)
+	fmt.Fprintf(&b, "  docker cp %s/demo.conf %s:/etc/nginx/sites-available/demo.conf\n", lesson2Dir, containerName)
 	fmt.Fprintf(&b, "  echo \"Дерево для %s скопировано.\"\n", s.Login)
 	b.WriteString("fi\n")
 
@@ -311,7 +318,64 @@ func startScript(blocks []string) string {
 	return header + strings.Join(blocks, "\n")
 }
 
+func addLesson2Content(preparedPath string) error {
+	notePath := filepath.Join(lesson2Dir, "note_2.txt")
+	if err := copyFile(notePath, filepath.Join(preparedPath, "note_2.txt")); err != nil {
+		return fmt.Errorf("note_2.txt: %w", err)
+	}
+
+	seoMessSrc := filepath.Join(lesson2Dir, "seo_mess")
+	seoMessDst := filepath.Join(preparedPath, "seo_mess")
+	if err := copyDirRecursive(seoMessSrc, seoMessDst); err != nil {
+		return fmt.Errorf("seo_mess: %w", err)
+	}
+
+	return nil
+}
+
+func copyFile(src, dst string) error {
+	data, err := os.ReadFile(src)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
+		return err
+	}
+	return os.WriteFile(dst, data, 0644)
+}
+
+func copyDirRecursive(src, dst string) error {
+	entries, err := os.ReadDir(src)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+
+	if err := os.MkdirAll(dst, 0755); err != nil {
+		return err
+	}
+
+	for _, entry := range entries {
+		srcPath := filepath.Join(src, entry.Name())
+		dstPath := filepath.Join(dst, entry.Name())
+
+		if entry.IsDir() {
+			if err := copyDirRecursive(srcPath, dstPath); err != nil {
+				return err
+			}
+		} else {
+			if err := copyFile(srcPath, dstPath); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 func simpleScript(lines []string) string {
-	header := "#!/bin/bash\n"
+	header := "#!/usr/bin/env bash\n"
 	return header + strings.Join(lines, "\n") + "\n"
 }
