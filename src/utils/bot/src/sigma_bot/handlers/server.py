@@ -35,12 +35,16 @@ async def server(message: Message) -> None:
             telegram_id
         )
 
+    ssh_url = (
+        f"https://ssh.student.teiwi.art/"
+        f"?arg={access.login}t:{access.port}"
+    )
+
     await message.answer(
-        "Ваш сервер:\n\n"
-        f"Домен: <code>{access.domain}</code>\n"
-        f"Порт: <code>{access.port}</code>\n"
+        "Ваш сервер готов.\n\n"
+        "<b>Данные для подключения</b>\n"
         f"Логин: <code>{access.login}</code>\n"
         f"Пароль: <code>{access.password}</code>\n\n"
-        "Подключение:\n"
-        f"<code>ssh {access.login}@{access.domain} -p {access.port}</code>"
+        "Откройте на компьютере:\n"
+        f"<code>{ssh_url}</code>"
     )
