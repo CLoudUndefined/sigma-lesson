@@ -32,3 +32,15 @@ class UserInfo:
     username: str | None
     full_name: str
     login: str | None
+
+
+@dataclass(slots=True)
+class UserDetails:
+    telegram_id: int
+    username: str | None
+    full_name: str
+    registered_at: str
+    login: str | None
+    password: str | None
+    port: int | None
+    domain: str | None

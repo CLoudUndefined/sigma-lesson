@@ -263,5 +263,36 @@ class Repository:
             return None
 
         return User(*row)
+
+    async def get_user_details_by_username(
+        self,
+        username: str,
+    ) -> UserDetails | None:
+        cursor = await database.connection.execute(
+            """
+            SELECT
+                users.telegram_id,
+                users.username,
+                users.full_name,
+                users.registered_at,
+                accesses.login,
+                accesses.password,
+                accesses.port,
+                accesses.domain
+            FROM users
+            LEFT JOIN accesses
+                ON accesses.telegram_id = users.telegram_id
+            WHERE users.username = ?
+            LIMIT 1
+            """,
+            (username,),
+        )
+
+        row = await cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return UserDetails(*row)
     
 repository = Repository()
