@@ -1,5 +1,5 @@
 from .db import database
-from .models import Access, User, AccessInfo, UserInfo
+from .models import Access, User, AccessInfo, UserInfo, UserDetails
 
 
 class Repository:
