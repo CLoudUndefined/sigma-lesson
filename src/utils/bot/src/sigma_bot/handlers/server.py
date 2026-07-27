@@ -37,7 +37,7 @@ async def server(message: Message) -> None:
 
     ssh_url = (
         f"https://ssh.student.teiwi.art/"
-        f"?arg={access.login}t:{access.port}"
+        f"?arg={access.login}:{access.port}"
     )
 
     await message.answer(
