@@ -3,10 +3,240 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Demo Site</title>
+<title>Контора</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: #FFEFD9;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(194, 174, 192, 0.15);
+}
+
+h1 a {
+  color: #C2AEC0;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+h1 a:hover {
+  text-decoration: underline;
+}
+
+p {
+  margin-bottom: 20px;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(194, 174, 192, 0.15);
+}
+
+.grid {
+  column-count: 4;
+  column-gap: 15px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 1200px) {
+  .grid {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    column-count: 1;
+  }
+}
+
+.grid-item {
+  break-inside: avoid;
+  margin-bottom: 15px;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 15px;
+  background: #E2D8E1;
+  display: inline-block;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(194, 174, 192, 0.15);
+  transition: transform 0.2s;
+}
+
+.grid-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 15px;
+}
+
+.grid-item:hover {
+  transform: scale(1.02);
+}
+
+.more-btn {
+  display: block;
+  margin: 20px auto;
+  padding: 15px 40px;
+  font-size: 18px;
+  font-weight: bold;
+  background: white;
+  border: 3px solid #C2AEC0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.more-btn:hover {
+  background: #C2AEC0;
+  color: white;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(226, 216, 225, 0.95);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 15px;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 40px;
+  color: #C2AEC0;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+</style>
 </head>
 <body>
 <h1>КУПИТЬ СЕРВЕР НЕДОРОГО БЕЗ СМС И РЕГИСТРАЦИИ В МОЕМ ТЕЛЕГРАМ КАНАЛЕ: <a href="https://t.me/KittyCode_teiwo">@KittyCode_teiwo</a></h1>
 <p>Добро пожаловать на демо-сайт.</p>
+
+<div class="grid" id="gallery"></div>
+
+<button class="more-btn" onclick="loadMore()">Еще!!!</button>
+
+<div class="modal" id="modal" onclick="closeModal()">
+  <button class="modal-close">&times;</button>
+  <img id="modalImg" src="" alt="">
+</div>
+
+<script>
+// Плейсхолдеры из папки assets
+const placeholders = [
+  './assets/cat-memes.jpg',
+  './assets/dumb.jpg',
+  './assets/meow.jpg',
+  './assets/monday_mood.jpg.jpg',
+  './assets/deploy_friday.png',
+];
+
+let currentPlaceholder = 0;
+let imageCounter = 0;
+
+function getNextPlaceholder() {
+  const placeholder = placeholders[currentPlaceholder];
+  currentPlaceholder = (currentPlaceholder + 1) % placeholders.length;
+  return placeholder;
+}
+
+// Случайная высота для разнообразия как в Pinterest
+function getRandomHeight() {
+  const heights = [200, 250, 300, 350, 400, 300, 280];
+  return heights[Math.floor(Math.random() * heights.length)];
+}
+
+function loadImages(count = 6) {
+  const gallery = document.getElementById('gallery');
+  
+  for (let i = 0; i < count; i++) {
+    const div = document.createElement('div');
+    div.className = 'grid-item';
+    
+    const img = document.createElement('img');
+    const height = getRandomHeight();
+    const catUrl = `https://cataas.com/cat?${imageCounter++}&height=${height}`;
+    
+    // Устанавливаем плейсхолдер
+    img.src = getNextPlaceholder();
+    
+    // Загружаем картинку с API
+    const tempImg = new Image();
+    tempImg.onload = function() {
+      img.src = catUrl;
+    };
+    tempImg.onerror = function() {
+      // Оставляем плейсхолдер если API не работает
+    };
+    tempImg.src = catUrl;
+    
+    img.onclick = function(e) {
+      e.stopPropagation();
+      openModal(this.src);
+    };
+    
+    div.appendChild(img);
+    gallery.appendChild(div);
+  }
+}
+
+function loadMore() {
+  loadImages(8);
+}
+
+function openModal(src) {
+  const modal = document.getElementById('modal');
+  const modalImg = document.getElementById('modalImg');
+  modalImg.src = src;
+  modal.classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+}
+
+document.addEventListener('keydown', e => e.key === 'Escape' && closeModal());
+
+// Загружаем первые картинки при старте
+loadImages(12);
+</script>
 </body>
 </html>
