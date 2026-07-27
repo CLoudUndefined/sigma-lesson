@@ -15,7 +15,7 @@ async def free(message: Message) -> None:
             "Использование:\n"
             "<code>/free @username</code>\n"
             "или\n"
-            "<code>/free Иванов Иван Иванович</code>"
+            "<code>/free Головач-Лена Володя Тимофеевич</code>"
         )
         return
 
