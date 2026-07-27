@@ -19,6 +19,7 @@ __pycache__/
 # Database
 *.db
 *.sqlite3
+src/utils/bot/data
 
 *.log
 
