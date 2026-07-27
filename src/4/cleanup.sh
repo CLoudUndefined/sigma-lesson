@@ -10,7 +10,7 @@ sudo chattr -i ~/backups
 #                   то есть самый старый бэкап.
 OLDEST=$(ls -t ~/backups | tail -n 1)
 
-rm "~/backups/$OLDEST"
+rm ~/backups/"$OLDEST"
 echo "Удалили старый бэкап: $OLDEST"
 
 echo "Закрываем замок обратно..."
