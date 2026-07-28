@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Основы работы в терминале</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@4.5.12/index.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #222222;
+            --text-primary: #e0e0e0;
+            --text-secondary: #888888;
+            --text-tertiary: #666666;
+            --border: #2a2a2a;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            padding: 60px 20px;
+            color: var(--text-primary);
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 80px;
+            padding-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1em;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .cards-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+            margin-bottom: 80px;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 45px;
+        }
+
+        .command {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 20px 25px;
+            border: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.3em;
+            margin-bottom: 35px;
+            display: block;
+            cursor: pointer;
+            user-select: all;
+        }
+
+        .description {
+            color: var(--text-primary);
+            line-height: 1.9;
+            font-size: 1.05em;
+            margin: 30px 0;
+            font-weight: 400;
+        }
+
+        .description p {
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin: 35px 0;
+        }
+
+        .section-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 18px;
+            font-size: 1.1em;
+        }
+
+        .section-content {
+            color: var(--text-secondary);
+            line-height: 1.9;
+            font-size: 1em;
+        }
+
+        .section-content p {
+            margin-bottom: 15px;
+        }
+
+        .flags-list {
+            background: var(--bg-tertiary);
+            padding: 30px;
+            margin: 30px 0;
+            border: 1px solid var(--border);
+        }
+
+        .flag-item {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .flag-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .flag-name {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .flag-description {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .example {
+            background: var(--bg-primary);
+            padding: 25px;
+            margin: 25px 0;
+            border: 1px solid var(--border);
+        }
+
+        .example-title {
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 18px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .example code {
+            color: var(--text-primary);
+            font-size: 1.05em;
+        }
+
+        .links-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 50px;
+            margin: 80px 0;
+        }
+
+        .links-section h2 {
+            font-size: 1.8em;
+            font-weight: 900;
+            margin-bottom: 40px;
+            color: var(--text-primary);
+        }
+
+        .link-item {
+            background: var(--bg-tertiary);
+            padding: 22px 28px;
+            margin: 15px 0;
+            border: 1px solid var(--border);
+        }
+
+        .link-item a {
+            color: var(--text-primary);
+            text-decoration: underline;
+            text-decoration-color: var(--text-secondary);
+            text-underline-offset: 3px;
+            text-decoration-style: dotted;
+            font-weight: 500;
+            font-size: 1em;
+            display: block;
+        }
+
+        .link-item a::before {
+            content: '[Habr] ';
+            color: var(--text-secondary);
+            margin-right: 8px;
+            font-weight: 700;
+        }
+
+        footer {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 50px;
+            margin-top: 80px;
+            text-align: center;
+        }
+
+        .footer-top {
+            font-size: 1.3em;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .footer-subtitle {
+            font-size: 0.95em;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .footer-credits {
+            font-size: 0.9em;
+            color: var(--text-tertiary);
+            font-weight: 400;
+            padding-top: 25px;
+        }
+
+        code {
+            background: var(--bg-tertiary);
+            padding: 5px 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        pre {
+            background: var(--bg-primary);
+            padding: 20px;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            margin-bottom: 12px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        ul li::before {
+            content: '—';
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .card {
+                padding: 30px 25px;
+            }
+
+            .links-section {
+                padding: 35px 25px;
+            }
+
+            footer {
+                padding: 35px 25px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Под капотом сервера</h1>
+            <div class="subtitle">Теоретический справочник по основным командам терминала</div>
+        </header>
+
+        <div class="cards-grid">
+            <!-- CAT -->
+            <div class="card">
+                <div class="command">cat</div>
+
+                <div class="description">
+                    <p>Команда cat (сокращение от concatenate — объединять) предназначена для чтения и вывода содержимого файлов. Это одна из самых базовых команд в Unix-подобных системах.</p>
+                    <p>Основное предназначение — быстрый просмотр содержимого текстовых файлов без необходимости открывать их в редакторе. Команда читает файл последовательно от начала до конца и выводит результат в стандартный поток вывода.</p>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Базовый синтаксис</div>
+                    <div class="section-content">
+                        <p><code>cat [файл...]</code></p>
+                        <p>Если не указать имя файла, cat будет читать из стандартного ввода (клавиатуры). Можно указать несколько файлов — они будут выведены последовательно.</p>
+                    </div>
+                </div>
+
+                <div class="flags-list">
+                    <div class="flag-item">
+                        <div class="flag-name">cat filename.txt</div>
+                        <div class="flag-description">Выводит содержимое файла filename.txt на экран.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">cat file1.txt file2.txt</div>
+                        <div class="flag-description">Последовательно выводит содержимое нескольких файлов.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CD -->
+            <div class="card">
+                <div class="command">cd</div>
+
+                <div class="description">
+                    <p>Команда cd (change directory) используется для навигации по файловой системе. Это основной инструмент для перемещения между каталогами в терминале.</p>
+                    <p>Текущая директория определяет, где будут выполняться все последующие команды.</p>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Базовый синтаксис</div>
+                    <div class="section-content">
+                        <p><code>cd [путь]</code></p>
+                        <p>Путь может быть абсолютным (начинается с корня /) или относительным (относительно текущей директории).</p>
+                    </div>
+                </div>
+
+                <div class="flags-list">
+                    <div class="flag-item">
+                        <div class="flag-name">cd /home/user/Documents</div>
+                        <div class="flag-description">Абсолютный путь — переход в указанную директорию независимо от текущего местоположения.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">cd Documents</div>
+                        <div class="flag-description">Относительный путь — переход в папку Documents внутри текущей директории.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">cd ..</div>
+                        <div class="flag-description">Переход на один уровень вверх к родительской директории.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">cd ../..</div>
+                        <div class="flag-description">Переход на два уровня вверх.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TREE -->
+            <div class="card">
+                <div class="command">tree</div>
+
+                <div class="description">
+                    <p>Команда tree визуализирует структуру каталогов в виде дерева. Это инструмент для понимания иерархии файловой системы.</p>
+                    <p>В отличие от ls, которая показывает только содержимое текущей папки, tree рекурсивно обходит все подкаталоги и выводит их в наглядном древовидном формате.</p>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Базовый синтаксис</div>
+                    <div class="section-content">
+                        <p><code>tree [опции] [директория]</code></p>
+                        <p>Без аргументов выводит дерево текущей директории. Можно указать путь к любой другой директории.</p>
+                    </div>
+                </div>
+
+                <div class="flags-list">
+                    <div class="flag-item">
+                        <div class="flag-name">tree</div>
+                        <div class="flag-description">Выводит полную структуру текущей директории со всеми вложенными файлами и папками.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">tree -a</div>
+                        <div class="flag-description">Показывает все файлы, включая скрытые (начинающиеся с точки).</div>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title">Пример вывода</div>
+                    <pre>.
+├── src
+│   ├── main.js
+│   └── utils
+│       └── helpers.js
+└── package.json</pre>
+                </div>
+            </div>
+
+            <!-- LS -->
+            <div class="card">
+                <div class="command">ls</div>
+
+                <div class="description">
+                    <p>Команда ls (list) выводит содержимое директорий. Это одна из самых часто используемых команд в терминале.</p>
+                    <p>Команда имеет множество опций, которые позволяют настроить формат вывода и фильтрацию.</p>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Базовый синтаксис</div>
+                    <div class="section-content">
+                        <p><code>ls [опции] [путь]</code></p>
+                        <p>Без аргументов выводит содержимое текущей директории. Можно указать путь к любой другой директории.</p>
+                    </div>
+                </div>
+
+                <div class="flags-list">
+                    <div class="flag-item">
+                        <div class="flag-name">ls</div>
+                        <div class="flag-description">Простой вывод файлов и папок в текущей директории. Показывает только имена.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">ls -a</div>
+                        <div class="flag-description">Показывает все файлы, включая скрытые (начинающиеся с точки).</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">ls -la</div>
+                        <div class="flag-description">Показывает все файлы в подробном формате с информацией о правах доступа, владельце, размере и дате изменения.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">ls -lt</div>
+                        <div class="flag-description">Показывает файлы в подробном формате, отсортированные по времени модификации (новые первые).</div>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title">Пример вывода ls -la</div>
+                    <pre>total 48
+drwxr-xr-x   6 user  staff   192 Jan 15 10:30 .
+drwxr-xr-x  25 user  staff   800 Jan 14 09:15 ..
+-rw-r--r--   1 user  staff  2048 Jan 15 10:30 readme.txt
+drwxr-xr-x   3 user  staff    96 Jan 12 14:20 .config
+-rwxr-xr-x   1 user  staff  1024 Jan 10 08:45 script.sh</pre>
+                    <div style="margin-top: 20px; color: var(--text-secondary); font-size: 0.95em;">
+                        <p>Расшифровка первого столбца (права доступа):</p>
+                        <ul style="margin-top: 10px;">
+                            <li>Первый символ: d (директория), - (файл), l (символическая ссылка)</li>
+                            <li>Следующие 9 символов: права для владельца, группы и остальных (rwx = read, write, execute)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Скрытые файлы</div>
+                    <div class="section-content">
+                        <p>В Unix-подобных системах файлы и директории, начинающиеся с точки, считаются скрытыми.</p>
+                        <p style="margin-top: 15px;">Примеры:</p>
+                        <ul style="margin-top: 10px;">
+                            <li><code>.gitignore</code> — конфигурация Git</li>
+                            <li><code>.env</code> — переменные окружения</li>
+                            <li><code>.bashrc</code> — настройки терминала</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Links Section -->
+        <div class="links-section">
+            <h2>Полезные материалы</h2>
+
+            <div class="link-item">
+                <a href="https://habr.com/ru/post/481398/" target="_blank">
+                    Командная строка Linux для начинающих — полное руководство
+                </a>
+            </div>
+
+            <div class="link-item">
+                <a href="https://habr.com/ru/post/150950/" target="_blank">
+                    15 примеров команды ls в Linux — от простого к сложному
+                </a>
+            </div>
+
+            <div class="link-item">
+                <a href="https://habr.com/ru/post/501442/" target="_blank">
+                    Навигация по файловой системе Linux: cd, pwd и ls
+                </a>
+            </div>
+
+            <div class="link-item">
+                <a href="https://habr.com/ru/post/522476/" target="_blank">
+                    Работа с файлами в Linux: cat, less, head, tail
+                </a>
+            </div>
+
+            <div class="link-item">
+                <a href="https://habr.com/ru/post/481066/" target="_blank">
+                    Команда tree — визуализация структуры каталогов
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-top">SIGMA.OMSK</div>
+            <div class="footer-subtitle">Под капотом сервера</div>
+            <div class="footer-credits">
+                Рудаков Т. | 2026 | Курников Н.
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Копирование команды при клике
+        document.querySelectorAll('.command').forEach(cmd => {
+            cmd.addEventListener('click', function() {
+                const text = this.textContent;
+                navigator.clipboard.writeText(text);
+            });
+        });
+    </script>
+</body>
+</html>
