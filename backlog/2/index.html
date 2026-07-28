@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Работа с файлами в терминале</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@4.5.12/index.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #222222;
+            --text-primary: #e0e0e0;
+            --text-secondary: #888888;
+            --text-tertiary: #666666;
+            --border: #2a2a2a;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            padding: 60px 20px;
+            color: var(--text-primary);
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 80px;
+            padding-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1em;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .cards-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+            margin-bottom: 80px;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 45px;
+        }
+
+        .command {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 20px 25px;
+            border: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.3em;
+            margin-bottom: 35px;
+            display: block;
+            cursor: pointer;
+            user-select: all;
+        }
+
+        .description {
+            color: var(--text-primary);
+            line-height: 1.9;
+            font-size: 1.05em;
+            margin: 30px 0;
+            font-weight: 400;
+        }
+
+        .description p {
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin: 35px 0;
+        }
+
+        .section-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 18px;
+            font-size: 1.1em;
+        }
+
+        .section-content {
+            color: var(--text-secondary);
+            line-height: 1.9;
+            font-size: 1em;
+        }
+
+        .section-content p {
+            margin-bottom: 15px;
+        }
+
+        .flags-list {
+            background: var(--bg-tertiary);
+            padding: 30px;
+            margin: 30px 0;
+            border: 1px solid var(--border);
+        }
+
+        .flag-item {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .flag-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .flag-name {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .flag-description {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .example {
+            background: var(--bg-primary);
+            padding: 25px;
+            margin: 25px 0;
+            border: 1px solid var(--border);
+        }
+
+        .example-title {
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 18px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .example code {
+            color: var(--text-primary);
+            font-size: 1.05em;
+        }
+
+        .links-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 50px;
+            margin: 80px 0;
+        }
+
+        .links-section h2 {
+            font-size: 1.8em;
+            font-weight: 900;
+            margin-bottom: 40px;
+            color: var(--text-primary);
+        }
+
+        .link-item {
+            background: var(--bg-tertiary);
+            padding: 22px 28px;
+            margin: 15px 0;
+            border: 1px solid var(--border);
+        }
+
+        .link-item a {
+            color: var(--text-primary);
+            text-decoration: underline;
+            text-decoration-color: var(--text-secondary);
+            text-underline-offset: 3px;
+            text-decoration-style: dotted;
+            font-weight: 500;
+            font-size: 1em;
+            display: block;
+        }
+
+        .link-item a::before {
+            content: '[Habr] ';
+            color: var(--text-secondary);
+            margin-right: 8px;
+            font-weight: 700;
+        }
+
+        footer {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 50px;
+            margin-top: 80px;
+            text-align: center;
+        }
+
+        .footer-top {
+            font-size: 1.3em;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .footer-subtitle {
+            font-size: 0.95em;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .footer-credits {
+            font-size: 0.9em;
+            color: var(--text-tertiary);
+            font-weight: 400;
+            padding-top: 25px;
+        }
+
+        code {
+            background: var(--bg-tertiary);
+            padding: 5px 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        pre {
+            background: var(--bg-primary);
+            padding: 20px;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            margin-bottom: 12px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        ul li::before {
+            content: '—';
+            position: absolute;
+            left: 0;
+            color: var(--text-tertiary);
+        }
+
+        .keyboard-key {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: inline-block;
+            margin: 0 2px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .card {
+                padding: 30px 25px;
+            }
+
+            .links-section {
+                padding: 35px 25px;
+            }
+
+            footer {
+                padding: 35px 25px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Работа с файлами</h1>
+            <div class="subtitle">Теоретический справочник по командам создания, копирования и перемещения файлов</div>
+        </header>
+
+        <div class="cards-grid">
+            <!-- MKDIR -->
+            <div class="card">
+                <div class="command">mkdir</div>
+
+                <div class="description">
+                    <p>Команда mkdir (make directory) создаёт новые директории в файловой системе. Это базовая команда для организации файловой структуры.</p>
+                    <p>При создании директории можно указать как относительный путь (от текущей директории), так и абсолютный путь (от корня файловой системы).</p>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Базовый синтаксис</div>
+                    <div class="section-content">
+                        <p><code>mkdir [опции] [имя_директории]</code></p>
+                        <p>Можно создать одну или несколько директорий одновременно, перечислив их имена через пробел.</p>
+                    </div>
+                </div>
+
+                <div class="flags-list">
+                    <div class="flag-item">
+                        <div class="flag-name">mkdir folder_name</div>
+                        <div class="flag-description">Создаёт директорию с именем folder_name в текущей директории.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">mkdir folder1 folder2 folder3</div>
+                        <div class="flag-description">Создаёт несколько директорий одновременно.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">mkdir -p path/to/nested/folder</div>
+                        <div class="flag-description">Создаёт вложенную структуру директорий. Флаг -p (parents) создаст все промежуточные директории, если они не существуют. Без этого флага команда выдаст ошибку, если родительских директорий не существует.</div>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title">Пример использования</div>
+                    <pre>mkdir projects
+mkdir -p projects/web/frontend/components</pre>
+                    <div style="margin-top: 15px; color: var(--text-secondary);">
+                        Первая команда создаст папку projects. Вторая создаст всю цепочку вложенных папок, даже если промежуточных директорий не существует.
+                    </div>
+                </div>
+            </div>
+
+            <!-- CP -->
+            <div class="card">
+                <div class="command">cp</div>
+
+                <div class="description">
+                    <p>Команда cp (copy) копирует файлы и директории из одного места в другое. Оригинальный файл остаётся на месте, создаётся его копия.</p>
+                    <p>При копировании сохраняется содержимое файла, но могут измениться метаданные (владелец, время создания) в зависимости от используемых флагов.</p>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Базовый синтаксис</div>
+                    <div class="section-content">
+                        <p><code>cp [опции] источник назначение</code></p>
+                        <p>Источник — это файл или директория, которую нужно скопировать. Назначение — куда копировать (путь или новое имя).</p>
+                    </div>
+                </div>
+
+                <div class="flags-list">
+                    <div class="flag-item">
+                        <div class="flag-name">cp file.txt copy.txt</div>
+                        <div class="flag-description">Копирует file.txt в новый файл copy.txt в текущей директории.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">cp file.txt /path/to/destination/</div>
+                        <div class="flag-description">Копирует файл в указанную директорию, сохраняя исходное имя файла.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">cp -r folder /path/to/destination/</div>
+                        <div class="flag-description">Копирует директорию со всем её содержимым. Флаг -r (recursive) необходим для копирования директорий. Без него команда откажется копировать папки.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">cp file1.txt file2.txt /destination/</div>
+                        <div class="flag-description">Копирует несколько файлов в указанную директорию. Последний аргумент всегда должен быть директорией назначения.</div>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title">Практический пример</div>
+                    <pre>cp report.pdf backup/
+cp -r project_folder /media/usb/</pre>
+                    <div style="margin-top: 15px; color: var(--text-secondary);">
+                        Первая команда создаёт копию файла в папке backup. Вторая копирует всю папку проекта на USB-накопитель.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Важные особенности</div>
+                    <div class="section-content">
+                        <p>Если файл назначения уже существует, cp перезапишет его без предупреждения. Будьте внимательны при копировании.</p>
+                        <p>При копировании директорий обязательно используйте флаг -r, иначе получите ошибку.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MV -->
+            <div class="card">
+                <div class="command">mv</div>
+
+                <div class="description">
+                    <p>Команда mv (move) перемещает или переименовывает файлы и директории. В отличие от cp, оригинальный файл удаляется из исходного местоположения.</p>
+                    <p>Одна и та же команда используется как для перемещения файлов между директориями, так и для их переименования. Если источник и назначение находятся в одной директории — это переименование, в разных — перемещение.</p>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Базовый синтаксис</div>
+                    <div class="section-content">
+                        <p><code>mv [опции] источник назначение</code></p>
+                        <p>Источник — файл или директория для перемещения. Назначение — новое местоположение или новое имя.</p>
+                    </div>
+                </div>
+
+                <div class="flags-list">
+                    <div class="flag-item">
+                        <div class="flag-name">mv oldname.txt newname.txt</div>
+                        <div class="flag-description">Переименовывает файл oldname.txt в newname.txt в той же директории.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">mv file.txt /path/to/destination/</div>
+                        <div class="flag-description">Перемещает файл в другую директорию, сохраняя его имя.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">mv file.txt /path/to/destination/newname.txt</div>
+                        <div class="flag-description">Перемещает файл в другую директорию и одновременно переименовывает его.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">mv folder /new/location/</div>
+                        <div class="flag-description">Перемещает директорию со всем содержимым. В отличие от cp, для mv не нужен флаг -r — команда автоматически работает с директориями.</div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">mv file1.txt file2.txt /destination/</div>
+                        <div class="flag-description">Перемещает несколько файлов в указанную директорию.</div>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title">Практический пример</div>
+                    <pre>mv draft.txt final.txt
+mv old_project archive/
+mv document.pdf ../parent_folder/report.pdf</pre>
+                    <div style="margin-top: 15px; color: var(--text-secondary);">
+                        Первая команда переименовывает файл. Вторая перемещает папку в архив. Третья перемещает файл на уровень выше и переименовывает его.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Важные особенности</div>
+                    <div class="section-content">
+                        <p>Команда mv необратима — после перемещения или переименования восстановить исходное состояние без резервной копии невозможно.</p>
+                        <p>Если файл назначения существует, mv перезапишет его без предупреждения.</p>
+                        <p>При перемещении файлов в пределах одной файловой системы операция происходит мгновенно (просто изменяется запись в таблице файлов). При перемещении между разными дисками файл физически копируется.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NANO -->
+            <div class="card">
+                <div class="command">nano</div>
+
+                <div class="description">
+                    <p>Nano — это простой текстовый редактор для терминала. Он удобен для быстрого редактирования конфигурационных файлов, написания скриптов и заметок прямо в командной строке.</p>
+                    <p>В отличие от более сложных редакторов (vim, emacs), nano имеет интуитивный интерфейс с подсказками в нижней части экрана, что делает его идеальным выбором для новичков.</p>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Базовый синтаксис</div>
+                    <div class="section-content">
+                        <p><code>nano [имя_файла]</code></p>
+                        <p>Если файл существует, он откроется для редактирования. Если не существует — будет создан новый файл при сохранении.</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Основные команды</div>
+                    <div class="section-content">
+                        <p>Все команды в nano начинаются с клавиши Ctrl. В подсказках внизу экрана символ ^ означает Ctrl.</p>
+                    </div>
+                </div>
+
+                <div class="flags-list">
+                    <div class="flag-item">
+                        <div class="flag-name">
+                            <span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">O</span>
+                        </div>
+                        <div class="flag-description">
+                            Сохранить файл (WriteOut). После нажатия появится запрос подтверждения имени файла. Нажмите Enter для сохранения под текущим именем или введите новое имя.
+                        </div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">
+                            <span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">X</span>
+                        </div>
+                        <div class="flag-description">
+                            Выход из редактора. Если есть несохранённые изменения, nano спросит, хотите ли вы их сохранить. Нажмите Y для сохранения, N для выхода без сохранения.
+                        </div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">
+                            <span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">K</span>
+                        </div>
+                        <div class="flag-description">
+                            Вырезать текущую строку или выделенный текст. Вырезанный текст помещается в буфер обмена.
+                        </div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">
+                            <span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">U</span>
+                        </div>
+                        <div class="flag-description">
+                            Вставить текст из буфера обмена в позицию курсора.
+                        </div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">
+                            <span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">W</span>
+                        </div>
+                        <div class="flag-description">
+                            Поиск текста в файле. Введите искомую строку и нажмите Enter.
+                        </div>
+                    </div>
+                    <div class="flag-item">
+                        <div class="flag-name">
+                            <span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">G</span>
+                        </div>
+                        <div class="flag-description">
+                            Открыть справку по командам nano.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title">Типичный рабочий процесс</div>
+                    <pre>nano config.txt
+[редактирование текста]
+Ctrl+O (сохранить)
+Enter (подтвердить имя файла)
+Ctrl+X (выйти)</pre>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Навигация в редакторе</div>
+                    <div class="section-content">
+                        <ul>
+                            <li>Стрелки — перемещение курсора</li>
+                            <li><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">A</span> — начало строки</li>
+                            <li><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">E</span> — конец строки</li>
+                            <li><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">Y</span> — страница вверх</li>
+                            <li><span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">V</span> — страница вниз</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Отмена действий</div>
+                    <div class="section-content">
+                        <p>В базовой версии nano нет встроенной функции отмены (Undo). Однако в современных версиях (2.8+) можно использовать:</p>
+                        <ul style="margin-top: 10px;">
+                            <li><span class="keyboard-key">Alt</span> + <span class="keyboard-key">U</span> — отменить последнее действие</li>
+                            <li><span class="keyboard-key">Alt</span> + <span class="keyboard-key">E</span> — вернуть отменённое действие (Redo)</li>
+                        </ul>
+                        <p style="margin-top: 15px;">Если эти комбинации не работают, ваша версия nano может быть устаревшей. В таком случае единственный способ отменить изменения — выйти без сохранения и открыть файл заново.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Links Section -->
+        <div class="links-section">
+            <h2>Полезные материалы</h2>
+
+            <div class="link-item">
+                <a href="https://habr.com/ru/post/481398/" target="_blank">
+                    Командная строка Linux для начинающих — полное руководство
+                </a>
+            </div>
+
+            <div class="link-item">
+                <a href="https://habr.com/ru/post/464131/" target="_blank">
+                    Основы работы с файлами в Linux: создание, копирование, перемещение
+                </a>
+            </div>
+
+            <div class="link-item">
+                <a href="https://habr.com/ru/post/210000/" target="_blank">
+                    Текстовый редактор Nano: руководство для начинающих
+                </a>
+            </div>
+
+            <div class="link-item">
+                <a href="https://habr.com/ru/post/99041/" target="_blank">
+                    Команды mkdir, cp, mv: практические примеры использования
+                </a>
+            </div>
+
+            <div class="link-item">
+                <a href="https://habr.com/ru/post/501442/" target="_blank">
+                    Работа с файлами и директориями в терминале Linux
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-top">SIGMA.OMSK</div>
+            <div class="footer-subtitle">Под капотом сервера</div>
+            <div class="footer-credits">
+                Рудаков Т. | 2026 | Курников Н.
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Копирование команды при клике
+        document.querySelectorAll('.command').forEach(cmd => {
+            cmd.addEventListener('click', function() {
+                const text = this.textContent;
+                navigator.clipboard.writeText(text);
+            });
+        });
+    </script>
+</body>
+</html>

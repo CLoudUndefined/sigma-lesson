@@ -1,1 +1,33 @@
 
+# Secrets >;3
+.env
+.env.*
+
+# Virtual Env
+venv/
+.venv/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Database
+*.db
+*.sqlite3
+src/utils/bot/data
+
+*.log
+
+# Настройки сред разработки (IDE)
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
