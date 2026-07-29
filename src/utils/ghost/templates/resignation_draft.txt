@@ -1,0 +1,9 @@
+draft.txt - не отправлено.
+
+Ниже - то, что осталось после третьего раза, когда я это переписывал.
+Не стал стирать в четвёртый.
+
+Кодировка стандартная, сам разберёшься: base64, потом ROT13
+(или наоборот, в зависимости от того, в какую сторону крутишь).
+
+cHVyZWFiaXZ4LiBhciBiZ2Nlbml5cmFiLiBjdmZ1aCBpIGdlcmd2bCBlbm0uIHhubXVxbGwgZW5tIGZndmVud2guIGFyIGdiIHB1Z2JvbCB6YXIgZ2hnIGN5YnViLiBjZWJmZ2IgeGJ0cW4gcHV2YXZmdSBicWFiIHYgZ2IgbXVyIGkgZ2VyZ3ZsIGVubSBvcm0gY2V2cHV2YWwgcHVnYi1nYiB6cmFsbmcgZmlyZXVoIC0gYW5wdXZhbnJmdSBxaHpuZywgbW5wdXJ6LiBiZmduaXlsaCBpZmxiIHhueCByZmcuIHhnYiBhbnZxbGJnIC0gZ2J6aCB2IGVubW92ZW5nZmxuLiBFLg==
