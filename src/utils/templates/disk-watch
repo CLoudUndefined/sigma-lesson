@@ -1,0 +1,22 @@
+#!/bin/bash
+# disk-watch - личная штука Володи, для себя. Проверяет место на диске
+# и ругается, если места мало. Работает отлично, если запускать руками.
+# Использование: disk-watch --threshold 80
+
+THRESHOLD=80
+if [[ "$1" == "--threshold" && -n "$2" ]]; then
+    THRESHOLD="$2"
+fi
+
+USAGE=$(df / --output=pcent | tail -n 1 | tr -dc '0-9')
+
+if [ -z "$USAGE" ]; then
+    echo "[disk-watch] не смог определить занятость диска"
+    exit 1
+fi
+
+if [ "$USAGE" -ge "$THRESHOLD" ]; then
+    echo "[alertik] Диск заполнен на ${USAGE}% - это выше порога ${THRESHOLD}%!"
+else
+    echo "[ok] Диск заполнен на ${USAGE}% - в пределах нормы (порог ${THRESHOLD}%)"
+fi
